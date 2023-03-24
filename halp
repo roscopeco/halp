@@ -1,0 +1,95 @@
+#!/usr/bin/env ruby
+#
+# halp is a zero-non-core-dependency ChatGPT terminal assistant
+# Copyright (c)2023 Ross Bamford; MIT License
+#
+require 'uri'
+require 'net/http'
+require 'json'
+require 'io/console'
+
+module Halp
+  KEY = ENV['OPENAI_API_KEY'] or raise "You must set OPENAI_API_KEY"
+  ENDPOINT = URI('https://api.openai.com/v1/chat/completions')
+  
+  class << self
+    def halp(prompt)
+      response = call_chatgpt(build_request(prompt))
+      options = extract_options(response)
+      choice = user_select_option(options)
+
+      if choice == 0
+        false
+      else
+        yield options[choice - 1]
+        true
+      end
+    end
+
+    private
+
+    def build_request(prompt)
+      { 
+        model: 'gpt-3.5-turbo', 
+        messages: [ 
+          { 
+            role: 'system', 
+            content: 'You are a helpful terminal assistant named Halp who can provide commands in various languages, and you never include leading dollar signs in your output.' 
+          }, { 
+            role: 'user', 
+            content: "I need a command: #{prompt}" 
+          }
+        ] 
+      }
+    end
+
+    def call_chatgpt(body)
+      req = Net::HTTP::Post.new(ENDPOINT)
+      req['Content-Type'] = 'application/json'
+      req['Authorization'] = "Bearer #{KEY}"
+      req.body = body.to_json
+
+      Net::HTTP.start(ENDPOINT.host, ENDPOINT.port, use_ssl: ENDPOINT.instance_of?(URI::HTTPS)) do |http|
+        response = http.request(req)
+        JSON.parse(response.body)
+      end
+    end
+
+    def extract_options(response)
+      response['choices']
+        .filter { |choice| choice['message']['role'].eql? 'assistant' }
+        .map { |choice| choice['message']['content'] }
+        .flat_map { |msg| msg.scan(/```[a-z]*[\n\s]*(.*?)```/m).flatten }
+    end
+
+    def user_select_option(options)
+      if options.empty?
+        STDERR.puts "\e[1;31m<No options available right now>\e[0m"
+        0
+      else
+        STDERR.puts "\e[1;37m0\e[0m:: \e[1;31mCancel"
+        options.each_with_index { |m, i| STDERR.puts "\e[1;37m#{i+1}\e[0m:: \e[1;32m#{m}" }
+        STDERR.print "\e[0mSelect, or zero (or non-number) to cancel [0, 1..#{options.size}]: "
+
+        choice = if options.size > 8 
+                   STDIN.gets.to_i
+                 else
+                   STDIN.getch.to_i
+                 end
+        
+        STDERR.puts
+        choice
+      end
+    end
+  end
+end
+
+if $0 == __FILE__
+  if ARGV.empty? || ARGV.include?('-h')
+    STDERR.puts("Usage: halp <what you need help with>")
+    exit 1
+  else
+    Halp.halp(ARGV.join(' ')) { |choice| puts choice } or exit!(1) 
+  end
+end
+
