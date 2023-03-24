@@ -2,6 +2,8 @@
 
 ## ChatGPT powered terminal helper
 
+> **Note** This was just a quick for-fun lunchtime hack, the code isn't especially clean, it's largely untested, and it could easily break in future. YMMV.
+
 ### Installation:
 
 Copy `halp` somewhere in your path.
@@ -12,7 +14,7 @@ https://platform.openai.com/account/api-keys
 You can now use halp:
 
 ```
-halp compile test.c on macos, using C99 and optimization level 3. The output file should be called program and should be a freestanding executable  | bash
+halp compile test.c on macos, using C99 and optimization level 3. The output file should be called program and should be an executable | bash
 
 0:: Cancel
 1:: clang -std=c99 -O3 -o program test.c
