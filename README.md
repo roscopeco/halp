@@ -14,7 +14,7 @@ https://platform.openai.com/account/api-keys
 You can now use halp:
 
 ```
-halp compile test.c on macos, using C99 and optimization level 3. The output file should be called program and should be an executable | bash
+halp compile test.c on macos, using C99 and optimization level 3. The output file should be called program and should be an executable
 
 0:: Cancel
 1:: clang -std=c99 -O3 -o program test.c
