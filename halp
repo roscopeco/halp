@@ -10,6 +10,7 @@ require 'io/console'
 
 module Halp
   KEY = ENV['OPENAI_API_KEY'] or raise "You must set OPENAI_API_KEY"
+  ENGINE = ENV['HALP_OPENAI_ENGINE'] || 'gpt-3.5-turbo'
   ENDPOINT = URI('https://api.openai.com/v1/chat/completions')
   
   class << self
@@ -30,7 +31,7 @@ module Halp
 
     def build_request(prompt)
       { 
-        model: 'gpt-3.5-turbo', 
+        model: ENGINE, 
         messages: [ 
           { 
             role: 'system', 

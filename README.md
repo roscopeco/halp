@@ -21,6 +21,10 @@ halp compile test.c on macos, using C99 and optimization level 3. The output fil
 Select, or zero (or non-number) to cancel [0, 1..1]:
 ```
 
+> **Note**: You can also set an optional `HALP_OPENAI_ENGINE` environment variable with the name of the engine 
+  you wish to use (e.g. `gpt-4`). Currently, halp defaults to `gpt-3.5-turbo`. For this to work you must have
+  API access to the selected engine via your provided API key.
+
 When called, halp will go to ChatGPT for command suggestions, and will present them to you, allowing you to choose
 which you want to run - you'll also have the ability to cancel. This means you can you can also directly pipe the output 
 to other commands, e.g. `bash`, since this will only be called if you select an option - if you cancel then the pipeline will terminate.
