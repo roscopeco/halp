@@ -1,5 +1,7 @@
 # Halp
 
+> **note**: This repository is archived and development / support is discontinued.
+
 ## ChatGPT powered terminal helper
 
 > **Note** This was just a quick for-fun lunchtime hack, the code isn't especially clean, it's largely untested, and it could easily break in future. YMMV.
